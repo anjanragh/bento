@@ -45,6 +45,23 @@ var playCmd = &cobra.Command{
 				return
 			}
 		}
+
+		player := exec.Command("mpv", "--no-video", "--input-terminal=no", "--input-ipc-server="+socketPath, "--", args[0])
+
+		player.Stdout = os.Stdout
+		player.Stderr = os.Stderr
+
+		if err := player.Start(); err != nil {
+			fmt.Println("Failed to start mpv : ", err)
+			return
+		}
+
+		fmt.Println("Playing : ", args[0])
+
+		if err := player.Wait(); err != nil {
+			fmt.Println("mpv stopped with err : ", err)
+			return
+		}
 	},
 }
 
