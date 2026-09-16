@@ -2,7 +2,9 @@ package utils
 
 import (
 	"errors"
+	"net"
 	"os"
+	"time"
 )
 
 func FileExists(filename string) bool {
@@ -14,4 +16,14 @@ func FileExists(filename string) bool {
 		return false
 	}
 	return false
+}
+
+func SocketActive(socketPath string) bool {
+	conn, err := net.DialTimeout("unix", socketPath, 100*time.Millisecond)
+
+	if err != nil {
+		return false
+	}
+	conn.Close()
+	return true
 }

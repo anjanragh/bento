@@ -5,11 +5,14 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 
 	utils "github.com/anjanragh/bento/internal"
 	"github.com/spf13/cobra"
 )
+
+const socketPath = "/tmp/bento.sock"
 
 // playCmd represents the play command
 var playCmd = &cobra.Command{
@@ -29,6 +32,19 @@ var playCmd = &cobra.Command{
 			return
 		}
 		fmt.Println("mpv exists!")
+
+		if utils.SocketActive(socketPath) {
+			fmt.Println("bento is already playing something!")
+			return
+		}
+
+		if utils.FileExists(socketPath) {
+			err := os.Remove(socketPath)
+			if err != nil {
+				fmt.Println("oh no!")
+				return
+			}
+		}
 	},
 }
 
