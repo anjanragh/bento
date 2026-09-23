@@ -19,10 +19,9 @@ var importCmd = &cobra.Command{
 	Short: "Lets you import a song from youtube",
 	Long:  `bento import <url>`,
 	Args:  cobra.MinimumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		if _, err := exec.LookPath("yt-dlp"); err != nil {
-			fmt.Println("yt-dlp not installed! Please install it using `brew install yt-dlp`")
-			return
+			return fmt.Errorf("yt-dlp not installed! Please install it using `brew install yt-dlp`")
 		}
 
 		ytArgs := []string{
@@ -51,9 +50,9 @@ var importCmd = &cobra.Command{
 		downloader.Stderr = os.Stderr
 
 		if err := downloader.Run(); err != nil {
-			fmt.Println("import failed:", err)
-			return
+			return fmt.Errorf("import failed: %w", err)
 		}
+		return nil
 	},
 }
 

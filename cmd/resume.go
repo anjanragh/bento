@@ -11,7 +11,7 @@ import (
 // resumeCmd represents the resume command
 var resumeCmd = &cobra.Command{
 	Use:   "resume",
-	Short: "lets you pause a playing song.",
+	Short: "lets you resume a playing song.",
 	Long:  `bento resume`,
 	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {

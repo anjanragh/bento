@@ -20,29 +20,25 @@ var playCmd = &cobra.Command{
 	Short: "Lets you play a song.",
 	Long:  `bento play <path_to_audio_file>`,
 	Args:  cobra.MinimumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		if !utils.FileExists(args[0]) {
-			fmt.Println("Oh no, the file doesn't exist")
-			return
+			return fmt.Errorf("file does not exist")
 		}
 		fmt.Println("play called on file ", args[0])
 
 		if _, err := exec.LookPath("mpv"); err != nil {
-			fmt.Println("mpv not installed! Please install it using `brew install mpv`")
-			return
+			return fmt.Errorf("mpv not installed! Please install it using `brew install mpv`")
 		}
 		fmt.Println("mpv exists!")
 
 		if utils.SocketActive(socketPath) {
-			fmt.Println("bento is already playing something!")
-			return
+			return fmt.Errorf("bento is already playing something!")
 		}
 
 		if utils.FileExists(socketPath) {
 			err := os.Remove(socketPath)
 			if err != nil {
-				fmt.Println("oh no!")
-				return
+				return fmt.Errorf("file could not be removed: %w", err)
 			}
 		}
 
@@ -52,16 +48,15 @@ var playCmd = &cobra.Command{
 		player.Stderr = os.Stderr
 
 		if err := player.Start(); err != nil {
-			fmt.Println("Failed to start mpv : ", err)
-			return
+			return fmt.Errorf("failed to start mpv: %w", err)
 		}
 
 		fmt.Println("Playing : ", args[0])
 
 		if err := player.Wait(); err != nil {
-			fmt.Println("mpv stopped with err : ", err)
-			return
+			return fmt.Errorf("mpv stopped with err: %w ", err)
 		}
+		return nil
 	},
 }
 
